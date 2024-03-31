@@ -1,75 +1,66 @@
 import pygame
-import sys
+from color import Color
 
 class Cell():
     def __init__(self, x:int, y:int, size:int, value:str, rect:pygame.Rect):
-        self.__SIZE = size
-        self.__CENTER = size // 3
-        self.__x = x
-        self.__y = y
-        self.__pos_x = x*size
-        self.__pos_y = y*size
-        self.__rect = rect
-        self.__value = value
-        self.__color = (255, 255, 255)
-        self.__font_color = (0, 128, 0)
-        self.__is_selected = False
-        self.is_read_only = True
+        self._CENTER = size // 3
+        self._x = x
+        self._y = y
+        self._pos_x = x*size
+        self._pos_y = y*size
+        self._rect = rect
+        self._value = value
+        self._color = Color.WHITE.value
+        self._font_color = (0, 128, 0)
+        self._is_selected = False
+        self._is_read_only = True
 
-        if self.__value == " ":
-            self.__font_color = (255, 255, 255)
-            self.is_read_only = False
+        if self._value == " ":
+            self._font_color = Color.WHITE.value
+            self._is_read_only = False
+
+    def __str__(self) -> str:
+        return f"({self._x}, {self._y}) = {self._value}"
         
+    @property
+    def value(self) -> str:
+        return self._value
+    
+    @property
+    def pos(self) -> tuple[int, int]:
+        return self._x, self._y
+    
+    @property
+    def is_selected(self) -> bool:
+        return self._is_selected
+    
+    @property
+    def is_read_only(self) -> bool:
+        return self._is_read_only
+    
     @staticmethod
-    def is_value_valid(value:str):
+    def is_value_allowed(value:str) -> bool:
         return value in "123456789 "
     
+    def set_value(self, value:str) -> None:
+        self._value = value
 
-    def __str__(self):
-        return f"({self.__x}, {self.__y}) = {self.__value}"
-    
-    def get_value(self):
-        return self.__value
-    
-    def get_position(self):
-        return self.__x, self.__y
-    
-    def get_size(self):
-        return self.__SIZE
-    
-    def is_selected(self):
-        return self.__is_selected
-    
-    def set_value(self, value:str):
-        self.__value = value
-
-    def set_color(self, color:tuple):
-        self.__color = color
-
-    def draw_rect(self, window:pygame.Surface, width:int=1):
+    def draw_rect(self, window:pygame.Surface, width:int=1) -> None:
         pygame.draw.rect(
             surface=window, 
-            color=self.__color, 
-            rect=self.__rect, 
+            color=self._color, 
+            rect=self._rect, 
             width=width
         )
 
-    def select(self):
-        self.__is_selected = True
-        self.__color = (255, 0, 0)
+    def draw_value(self, window: pygame.Surface, font:pygame.font.Font) -> None:
+        text = font.render(self._value, True, self._font_color)
+        window.blit(text, (self._pos_x+self._CENTER, self._pos_y + self._CENTER))
 
-    def deselect(self):
-        self.__is_selected = False
-        self.__color = (255, 255, 255)
-    
-    def draw_value(self, window: pygame.Surface, font:pygame.font.Font):
-        text = font.render(self.__value, True, self.__font_color)
-        window.blit(text, (self.__pos_x+self.__CENTER, self.__pos_y + self.__CENTER))
+    def select(self) -> None:
+        self._is_selected = True
+        self._color = Color.RED.value
 
-    def reset_value(self, window: pygame.Surface):
-        self.set_color((255, 255, 255))
-        self.draw_rect(window, 1)
-
-    def is_clicked(self, pos):
-        x, y = pos
-        return self.__x == x and self.__y == y
+    def deselect(self) -> None:
+        self._is_selected = False
+        self._color = Color.WHITE.value
